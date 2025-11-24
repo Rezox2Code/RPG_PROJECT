@@ -1,143 +1,139 @@
 import tkinter as tk
 from tkinter import ttk
 
-# Personnages
-personnages = [
-    "Fleuriste", "Le Pape", "CM", "Cuisinier",
-    "Agent Sécurité", "Huissier", "Procureur", "Dragon"
-]
 
-descriptions = {
-    "Fleuriste": {
-        "Compétence": "Bouquet explosif (dégâts continus)",
-        "Buff": "Parfum apaisant (soin équipe, 3 tours)",
-        "Nerf": "Allergies (-10% précision)"
-    },
-    "Le Pape": {
-        "Compétence": "Anathème (gros dégâts)",
-        "Buff": "Bénédiction (+attaque & défense)",
-        "Nerf": "Dogme rigide (inutilisable <20% PV)"
-    },
-    "CM": {
-        "Compétence": "Bad Buzz (provocation + debuff)",
-        "Buff": "Post Viral (boost aléatoire)",
-        "Nerf": "Burn-out (-15% vitesse <50% PV)"
-    },
-    "Cuisinier": {
-        "Compétence": "Marmite de destruction (zone)",
-        "Buff": "Plat revigorant (+PV max)",
-        "Nerf": "Surcuisson (risque auto-brûlure)"
-    },
-    "Agent Sécurité": {
-        "Compétence": "Contrôle musclé (stun 1 tour)",
-        "Buff": "Armure anti-émeute (tank)",
-        "Nerf": "Procédure admin (perd un tour)"
-    },
-    "Huissier": {
-        "Compétence": "Saisie immédiate (retire buff + dégâts)",
-        "Buff": "Avis de passage (+défense/précision)",
-        "Nerf": "Papiers manquants (20% échec)"
-    },
-    "Procureur": {
-        "Compétence": "Réquisitoire final (gros dégâts)",
-        "Buff": "Pièce à Conviction (+attaque si debuff)",
-        "Nerf": "Objection ! (-20% attaque si allié K.O)"
-    },
-    "Dragon": {
-        "Compétence": "Souffle incendiaire (énorme zone)",
-        "Buff": "Écailles Titan (-dégâts)",
-        "Nerf": "Cupidité (perd un tour si objet rare)"
-    },
-}
+class Personnage:
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
 
-# Spécialisations
-specialisations = [
-    "La Cage",
-    "La Fusion",
-    "Le Bourré",
-    "La Sarbacane",
-    "La Magie Noire",
-    "L'Exorcisme"
-]
 
-selected_char = 0
+class Spécialisation:
+    def __init__(self, name):
+        self.name = name
 
-# --- Interface Graphique ---
-def update_display():
-    """Met à jour l’affichage en fonction du personnage sélectionné"""
-    perso_label.config(text=f"Personnage : {personnages[selected_char]}")
-    
-    details = descriptions[personnages[selected_char]]
-    details_text.set(
-        f"Compétence : {details['Compétence']}\n"
-        f"Buff : {details['Buff']}\n"
-        f"Nerf : {details['Nerf']}"
-    )
 
-def prev_char():
-    """Personnage précédent"""
-    global selected_char
-    selected_char = (selected_char - 1) % len(personnages)
-    update_display()
+class RPGSelectorApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sélecteur de Personnage RPG")
+        self.root.geometry("500x400")
+        self.root.resizable(False, False)
 
-def next_char():
-    """Personnage suivant"""
-    global selected_char
-    selected_char = (selected_char + 1) % len(personnages)
-    update_display()
+        self.Personnages = self.load_Personnages()
+        self.Specialisations = self.load_Specialisations()
+        self.selected_index = 0
 
-def validate_selection():
-    """Valide et affiche le choix"""
-    result_label.config(
-        text=f"Tu as choisi : {personnages[selected_char]}\n"
-             f"Spécialisation : {spec_var.get()}"
-    )
+        self.details_text = tk.StringVar()
+        self.spec_var = tk.StringVar(value=self.Specialisations[0].name)
 
-# Création fenêtre
-root = tk.Tk()
-root.title("Sélecteur de Personnage RPG")
-root.geometry("500x400")
-root.resizable(False, False)
+        self.create_ajouts()
+        self.update_display()
 
-# Boutons navigation
-frame_top = tk.Frame(root)
-frame_top.pack(pady=10)
+    # Chargement des personnages
+    def load_Personnages(self):
+        descriptions = {
+            "Fleuriste": {
+                "Compétence": "Bouquet explosif (dégâts continus)",
+                "Buff": "Parfum apaisant (soin équipe, 3 tours)",
+                "Nerf": "Allergies (-10% précision)"
+            },
+            "Le Pape": {
+                "Compétence": "Anathème (gros dégâts)",
+                "Buff": "Bénédiction (+attaque & défense)",
+                "Nerf": "Dogme rigide (inutilisable <20% PV)"
+            },
+            "CM": {
+                "Compétence": "Bad Buzz (provocation + debuff)",
+                "Buff": "Post Viral (boost aléatoire)",
+                "Nerf": "Burn-out (-15% vitesse <50% PV)"
+            },
+            "Cuisinier": {
+                "Compétence": "Marmite de destruction (zone)",
+                "Buff": "Plat revigorant (+PV max)",
+                "Nerf": "Surcuisson (risque auto-brûlure)"
+            },
+            "Agent Sécurité": {
+                "Compétence": "Contrôle musclé (stun 1 tour)",
+                "Buff": "Armure anti-émeute (tank)",
+                "Nerf": "Procédure admin (perd un tour)"
+            },
+            "Huissier": {
+                "Compétence": "Saisie immédiate (retire buff + dégâts)",
+                "Buff": "Avis de passage (+défense/précision)",
+                "Nerf": "Papiers manquants (20% échec)"
+            },
+            "Procureur": {
+                "Compétence": "Réquisitoire final (gros dégâts)",
+                "Buff": "Pièce à Conviction (+attaque si debuff)",
+                "Nerf": "Objection ! (-20% attaque si allié K.O)"
+            },
+            "Dragon": {
+                "Compétence": "Souffle incendiaire (énorme zone)",
+                "Buff": "Écailles Titan (-dégâts)",
+                "Nerf": "Cupidité (perd un tour si objet rare)"
+            },
+        }
+        return [Personnage(name, descriptions[name]) for name in descriptions]
 
-prev_button = tk.Button(frame_top, text="⬅️", width=5, command=prev_char)
-prev_button.grid(row=0, column=0)
+    # Chargement des Specialisations
+    def load_Specialisations(self):
+        names = [
+            "La Cage", "La Fusion", "Le Bourré",
+            "La Sarbacane", "La Magie Noire", "L'Exorcisme"
+        ]
+        return [Spécialisation(name) for name in names]
 
-perso_label = tk.Label(frame_top, text="", font=("Arial", 14))
-perso_label.grid(row=0, column=1, padx=20)
+    # Création de l'interface
+    def create_ajouts(self):
+        frame_top = tk.Frame(self.root)
+        frame_top.pack(pady=10)
 
-next_button = tk.Button(frame_top, text="➡️", width=5, command=next_char)
-next_button.grid(row=0, column=2)
+        tk.Button(frame_top, text="⬅️", width=5, command=self.prev_char).grid(row=0, column=0)
+        self.perso_label = tk.Label(frame_top, text="", font=("Arial", 14))
+        self.perso_label.grid(row=0, column=1, padx=20)
+        tk.Button(frame_top, text="➡️", width=5, command=self.next_char).grid(row=0, column=2)
 
-# Affichage détails
-details_text = tk.StringVar()
-details_label = tk.Label(root, textvariable=details_text, font=("Arial", 10), justify="left")
-details_label.pack(pady=10)
+        tk.Label(self.root, textvariable=self.details_text, font=("Arial", 10), justify="left").pack(pady=10)
 
-# Choix de spécialisation
-spec_frame = tk.Frame(root)
-spec_frame.pack(pady=10)
+        spec_frame = tk.Frame(self.root)
+        spec_frame.pack(pady=10)
+        tk.Label(spec_frame, text="Spécialisation :").pack(side="left")
+        ttk.Combobox(spec_frame, textvariable=self.spec_var,
+                     values=[spec.name for spec in self.Specialisations],
+                     state="readonly").pack(side="left", padx=5)
 
-spec_label = tk.Label(spec_frame, text="Spécialisation :")
-spec_label.pack(side="left")
+        tk.Button(self.root, text="Valider", command=self.validate_selection, bg="lightgreen").pack(pady=15)
+        self.result_label = tk.Label(self.root, text="", font=("Arial", 12), fg="blue")
+        self.result_label.pack(pady=10)
 
-spec_var = tk.StringVar(value=specialisations[0])
-spec_dropdown = ttk.Combobox(spec_frame, textvariable=spec_var, values=specialisations, state="readonly")
-spec_dropdown.pack(side="left", padx=5)
+    # Mise à jour du texte affiché
+    def update_display(self):
+        char = self.Personnages[self.selected_index]
+        self.perso_label.config(text=f"Personnage : {char.name}")
+        self.details_text.set(
+            f"Compétence : {char.description['Compétence']}\n"
+            f"Buff : {char.description['Buff']}\n"
+            f"Nerf : {char.description['Nerf']}"
+        )
 
-# Bouton de validation
-validate_button = tk.Button(root, text="Valider", command=validate_selection, bg="lightgreen")
-validate_button.pack(pady=15)
+    def prev_char(self):
+        self.selected_index = (self.selected_index - 1) % len(self.Personnages)
+        self.update_display()
 
-# Résultat
-result_label = tk.Label(root, text="", font=("Arial", 12), fg="blue")
-result_label.pack(pady=10)
+    def next_char(self):
+        self.selected_index = (self.selected_index + 1) % len(self.Personnages)
+        self.update_display()
 
-# Initialisation affichage
-update_display()
+    def validate_selection(self):
+        self.result_label.config(
+            text=f"Tu as choisi : {self.Personnages[self.selected_index].name}\n"
+                 f"Spécialisation : {self.spec_var.get()}"
+        )
 
-# Exécution
-root.mainloop()
+
+# Lancement de l’application
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = RPGSelectorApp(root)
+    root.mainloop()
